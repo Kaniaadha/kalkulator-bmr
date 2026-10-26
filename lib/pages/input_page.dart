@@ -281,7 +281,7 @@ class _InputPageState extends State<InputPage> {
                       fieldName: 'height',
                       minimum: 100,
                       maximum: 250,
-                      suffix: 'inches',
+                      suffix: 'cm',
                     ),
                     const SizedBox(height: 20),
 
@@ -291,7 +291,7 @@ class _InputPageState extends State<InputPage> {
                       fieldName: 'weight',
                       minimum: 20,
                       maximum: 400,
-                      suffix: 'lbs',
+                      suffix: 'kg',
                     ),
                     const SizedBox(height: 20),
 
