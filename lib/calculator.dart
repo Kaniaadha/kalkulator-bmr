@@ -1,4 +1,3 @@
-
 import 'constants.dart';
 
 // Activity levels and their multipliers.
@@ -47,6 +46,10 @@ const List<ActivityLevel> activityLevels = [
   ),
 ];
 
+// Kelas inti perhitungan BMR (tidak berisi tampilan).
+// Dipanggil dari InputPage._calculate() setelah input lolos validasi.
+// Rumus yang dipakai berbasis satuan metrik: weight (kg), height (cm), age (tahun).
+// Hasil BMR selalu dalam kcal/hari; konversi ke kJ dilakukan di ResultPage.
 class BMRCalculator {
   final double weight;
   final double height;
@@ -65,6 +68,8 @@ class BMRCalculator {
   });
 
   // Calculate BMR using the selected formula.
+  // Alur: memilih rumus berdasarkan nilai enum `formula` (lihat constants.dart),
+  // lalu memanggil fungsi privat yang sesuai.
   double calculateBMR() {
     switch (formula) {
       case BMRFormula.mifflinStJeor:
@@ -80,6 +85,7 @@ class BMRCalculator {
 
   // Mifflin-St Jeor formula.
   double _calculateMifflinStJeor() {
+    // Bagian yang sama untuk pria dan wanita; bedanya hanya konstanta di akhir (+5 / -161).
     final base = (10 * weight) + (6.25 * height) - (5 * age);
 
     if (gender == Gender.male) {

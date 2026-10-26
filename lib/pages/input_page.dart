@@ -1,10 +1,16 @@
-
 import 'package:flutter/material.dart';
 
 import '../calculator.dart';
 import '../constants.dart';
 import 'result_page.dart';
 
+// Halaman 1: formulir input.
+// Alur halaman ini:
+//   a. Pengguna memilih gender dan mengisi umur, tinggi, berat.
+//   b. (Opsional) membuka 'Settings' untuk memilih rumus BMR dan satuan hasil.
+//      Jika rumus Katch-McArdle dipilih, field body fat muncul.
+//   c. Tombol 'Calculate BMR' memanggil _calculate(): validasi -> hitung -> buka ResultPage.
+// StatefulWidget dipakai karena tampilan berubah mengikuti pilihan pengguna.
 class InputPage extends StatefulWidget {
   const InputPage({super.key});
 
@@ -13,13 +19,17 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
+  // Kunci form: dipakai untuk menjalankan validasi semua field sekaligus.
   final _formKey = GlobalKey<FormState>();
 
+  // Controller menyimpan teks yang diketik pengguna pada tiap field.
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _bodyFatController = TextEditingController();
 
+  // State pilihan pengguna beserta nilai awalnya.
+  // Setiap perubahan dibungkus setState() agar layar digambar ulang.
   Gender _gender = Gender.male;
   BMRFormula _formula = BMRFormula.mifflinStJeor;
   bool _useKilojoules = false;
@@ -66,20 +76,26 @@ class _InputPageState extends State<InputPage> {
 
   // Read form data and navigate to the result page.
   void _calculate() {
+    // Langkah 1: tutup keyboard.
     FocusScope.of(context).unfocus();
 
+    // Langkah 2: validasi semua field. Jika ada yang tidak valid, proses berhenti
+    // dan pesan error tampil di bawah field terkait.
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    // Langkah 3: ubah teks input menjadi angka (aman karena sudah divalidasi).
     final age = int.parse(_ageController.text.trim());
     final height = double.parse(_heightController.text.trim());
     final weight = double.parse(_weightController.text.trim());
 
+    // Body fat hanya dibaca bila rumus Katch-McArdle dipilih; selain itu bernilai null.
     final bodyFat = _formula == BMRFormula.katchMcArdle
         ? double.parse(_bodyFatController.text.trim())
         : null;
 
+    // Langkah 4: buat objek kalkulator berisi data pengguna dan rumus terpilih.
     final calculator = BMRCalculator(
       weight: weight,
       height: height,
@@ -89,8 +105,11 @@ class _InputPageState extends State<InputPage> {
       bodyFatPercentage: bodyFat,
     );
 
+    // Langkah 5: hitung BMR (hasil dalam kcal/hari).
     final bmr = calculator.calculateBMR();
 
+    // Langkah 6: pindah ke ResultPage sambil membawa hasil BMR, nama rumus,
+    // dan pilihan satuan (kcal atau kJ).
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -198,6 +217,8 @@ class _InputPageState extends State<InputPage> {
   }
 
   @override
+  // Susunan tampilan dari atas ke bawah:
+  // judul -> pilihan gender -> umur -> tinggi -> berat -> menu Settings -> tombol Calculate -> catatan.
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -309,6 +330,7 @@ class _InputPageState extends State<InputPage> {
                       ),
                     ),
 
+                    // Bagian Settings hanya tampil saat _showSettings bernilai true (diubah lewat tombol 'Settings').
                     if (_showSettings) ...[
                       const Divider(color: borderColor),
                       const SizedBox(height: 12),
@@ -365,6 +387,7 @@ class _InputPageState extends State<InputPage> {
                         },
                       ),
 
+                      // Field body fat hanya muncul untuk rumus Katch-McArdle, karena rumus ini membutuhkannya.
                       if (_formula == BMRFormula.katchMcArdle) ...[
                         const SizedBox(height: 18),
                         _numberField(

@@ -1,9 +1,12 @@
-
 import 'package:flutter/material.dart';
 
 import '../calculator.dart';
 import '../constants.dart';
 
+// Halaman 2: hasil perhitungan.
+// Menerima data dari InputPage lewat constructor (bmr, formulaName, useKilojoules).
+// StatelessWidget dipakai karena halaman ini hanya menampilkan data tanpa perubahan state.
+// Alur: tampilkan BMR utama -> tampilkan tabel kebutuhan kalori harian -> tombol kembali.
 class ResultPage extends StatelessWidget {
   final double bmr;
   final String formulaName;
@@ -29,6 +32,7 @@ class ResultPage extends StatelessWidget {
   String get _unit => useKilojoules ? 'kJ/day' : 'kcal/day';
 
   @override
+  // Susunan tampilan: judul -> kartu BMR -> tabel tingkat aktivitas -> catatan -> tombol kembali.
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -139,6 +143,7 @@ class ResultPage extends StatelessWidget {
                     child: Column(
                       children: [
                         _tableHeader(),
+                        // Satu baris tabel untuk setiap tingkat aktivitas yang didefinisikan di calculator.dart.
                         for (int i = 0; i < activityLevels.length; i++)
                           _activityRow(activityLevels[i], i),
                       ],
@@ -159,6 +164,7 @@ class ResultPage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
+                      // Menutup halaman ini dan kembali ke InputPage.
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: primaryColor,
@@ -225,6 +231,7 @@ class ResultPage extends StatelessWidget {
 
   // Build a row for each activity level.
   Widget _activityRow(ActivityLevel activity, int index) {
+    // Kebutuhan kalori harian = BMR x pengali tingkat aktivitas.
     final dailyCalories = bmr * activity.multiplier;
 
     return Container(
